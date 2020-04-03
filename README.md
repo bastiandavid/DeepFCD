@@ -1,5 +1,5 @@
 # DeepFCD
-Detect focal cortical dysplasias using a generative modelling approach as presented as presented on OHBM 2019 in Rome (see our homepage for e-Poster, OHBM oral session and more information: https://www.translationalneuroimaging.de/ohbm-gan-talk )
+Detect focal cortical dysplasias using a generative modelling approach as presented on OHBM 2019 in Rome (see our homepage for e-Poster, OHBM oral session and more information: https://www.translationalneuroimaging.de/ohbm-gan-talk )
 
 Repository is WIP, nothing interesting to see here *yet*.
 
