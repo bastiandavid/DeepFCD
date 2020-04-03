@@ -15,3 +15,10 @@ CUDA release 10.2
 
 GAN inspired by pix2pix (Isola, Zhu et al., 2016)  
 (github repo: https://github.com/phillipi/pix2pix)  
+
+## GAN example output
+
+<img src="./assets/example_outputs/test.png" width=500 align="center">
+<img src="./assets/example_outputs/test2.png" width=500 align="center">
+<img src="./assets/example_outputs/test3.png" width=500 align="center">
+<img src="./assets/example_outputs/test4.png" width=500 align="center">
