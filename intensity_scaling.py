@@ -51,8 +51,8 @@ def histo_matching(synth_img, real_img):
     
     return Image.fromarray(np.uint8(synth_img_scaled))
 
-synth_list=glob.glob(os.path.join(SYNTHPATH,"test/11362*.png"))
-real_list=glob.glob(os.path.join(REALPATH,"test/11362*.png"))
+synth_list=glob.glob(os.path.join(SYNTHPATH,"test/*.png"))
+real_list=glob.glob(os.path.join(REALPATH,"test/*.png"))
 
 for synth_img, real_img in zip(synth_list, real_list):
     
