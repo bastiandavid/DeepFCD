@@ -56,8 +56,8 @@ real_list=glob.glob(os.path.join(REALPATH,"test/*.png"))
 
 for synth_img, real_img in zip(synth_list, real_list):
     
-    synth_img_minmax_scaled= intensity_rescale(synth_img, real_img)
-    synth_img_minmax_scaled.save(os.path.join(OUTPATH,'test','minmax',synth_img.split('/')[-1]))
+    # synth_img_minmax_scaled= intensity_rescale(synth_img, real_img)
+    # synth_img_minmax_scaled.save(os.path.join(OUTPATH,'test','minmax',synth_img.split('/')[-1]))
     
     synth_img_histo_scaled = histo_matching(synth_img, real_img)
-    synth_img_histo_scaled.save(os.path.join(OUTPATH,'test','histo',synth_img.split('/')[-1]))
+    synth_img_histo_scaled.save(os.path.join(OUTPATH,'test',synth_img.split('/')[-1]))
