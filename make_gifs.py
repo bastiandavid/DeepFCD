@@ -18,9 +18,9 @@ TARGETPATH="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/te
 SYNTHPATH="/home/bdavid/Deep_Learning/playground/intensity_rescaled/test"
 OUTPATH="/home/bdavid/Deep_Learning/DeepFCD/assets/example_outputs"
 
-subjid="300"
+subjid="555-nase"
 #set offset to not show face in GIFs
-offset=210
+offset=190
 
 
 
