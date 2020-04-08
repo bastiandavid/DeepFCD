@@ -8,15 +8,19 @@ Created on Tue Apr  7 23:21:47 2020
 
 
 import os
-import numpy as np
 import glob
 import imageio
+import io
 from PIL import Image
 
 INPUTPATH="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/test"
 TARGETPATH="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/test"
 SYNTHPATH="/home/bdavid/Deep_Learning/playground/intensity_rescaled/test"
 OUTPATH="/home/bdavid/Deep_Learning/DeepFCD/assets/example_outputs"
+
+subjid="300"
+#set offset to not show face in GIFs
+offset=210
 
 
 
@@ -33,12 +37,16 @@ def horizontal_concat(input_img, target_img, synth_img):
     for im in images:
       new_im.paste(im, (x_offset,0))
       x_offset += im.size[0]
+      
+    imgByteArr = io.BytesIO()
+    new_im.save(imgByteArr, format='PNG')
+    imgByteArr = imgByteArr.getvalue()
     
-    return new_im
+    return imgByteArr
 
-input_list = sorted(glob.glob(os.path.join(INPUTPATH,"11362*.png")))[174::-1]
-target_list = sorted(glob.glob(os.path.join(TARGETPATH,"11362*.png")))[174::-1]
-synth_list = sorted(glob.glob(os.path.join(SYNTHPATH,"11362*.png")))[174::-1]
+input_list = sorted(glob.glob(os.path.join(INPUTPATH,subjid+"*.png")))[offset::-1]
+target_list = sorted(glob.glob(os.path.join(TARGETPATH,subjid+"*.png")))[offset::-1]
+synth_list = sorted(glob.glob(os.path.join(SYNTHPATH,subjid+"*.png")))[offset::-1]
 
 gif_images = []
 
@@ -52,4 +60,10 @@ synth_list=synth_list[::-1]
 for input_img, target_img, synth_img in zip(input_list, target_list, synth_list):
     gif_images.append(imageio.imread(horizontal_concat(input_img, target_img, synth_img)))
 
-imageio.mimsave(os.path.join(OUTPATH,"synth_flair_1.gif"),gif_images, duration=0.08)
+no_of_gifs=len(glob.glob(os.path.join(OUTPATH,"T1_FLAIR_SYNTH*.gif")))
+
+imageio.mimsave(os.path.join(OUTPATH,"T1_FLAIR_SYNTH_"+str(no_of_gifs).zfill(2)+".gif"),gif_images, duration=0.08)
+
+#if compression needed, install pygifsicle and uncomment following lines
+#from pygifsicle import optimize
+#optimize(os.path.join(OUTPATH,"T1_FLAIR_SYNTH_"+str(no_of_gifs).zfill(2)+".gif"))
