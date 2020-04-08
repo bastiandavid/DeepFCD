@@ -1,7 +1,7 @@
 # DeepFCD
-Detect focal cortical dysplasias using a generative modelling approach as presented on OHBM 2019 in Rome (see our homepage for e-Poster, OHBM oral session and more information: https://www.translationalneuroimaging.de/ohbm-gan-talk )
+Detect focal cortical dysplasias using a generative modelling approach as presented on OHBM 2019 in Rome (see our homepage for e-Poster, OHBM oral session and more information: https://www.translationalneuroimaging.de/ohbm-gan-talk ).
 
-Repository is WIP, nothing interesting to see here *yet*.
+Repository is WIP, nothing interesting to see here *yet*. If you need a state-of-the-art program to automatically detect your FCDs, please check out MAP18 (https://www.translationalneuroimaging.de/map18).
 
 ## Software used
 Python 3.7.4  
