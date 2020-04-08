@@ -18,7 +18,7 @@ GAN inspired by pix2pix (Isola, Zhu et al., 2016)
 
 ## GAN example output
 
-<img src="./assets/example_outputs/test.png" width=500 align="center">
-<img src="./assets/example_outputs/test2.png" width=500 align="center">
-<img src="./assets/example_outputs/test3.png" width=500 align="center">
-<img src="./assets/example_outputs/test4.png" width=500 align="center">
+<img src="./assets/example_outputs/T1_FLAIR_SYNTH_00.gif" width=500 align="center">
+<img src="./assets/example_outputs/T1_FLAIR_SYNTH_01.gif" width=500 align="center">
+<img src="./assets/example_outputs/T1_FLAIR_SYNTH_02.gif" width=500 align="center">
+
