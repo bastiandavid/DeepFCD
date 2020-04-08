@@ -9,7 +9,7 @@ Created on Wed Dec 12 16:13:02 2018
 import os
 import argparse
 import glob
-import re
+#import re
 from PIL import Image
 from PIL import ImageChops
 import warnings
@@ -17,11 +17,13 @@ warnings.filterwarnings("ignore")
 
 def subtract_GAN_images(realdir, fakedir, subjid, direction, pngoutdir):
     
-    for png in sorted(glob.glob(os.path.join(fakedir,'*.png'))):
+    fakeslices=sorted(glob.glob(os.path.join(fakedir,'*.png')))
+    realslices=sorted(glob.glob(os.path.join(realdir,'*.png')))
+    
+    for fake_png, real_png in zip(fakeslices, realslices) :
         
-        fakeslice=Image.open(png).convert('L')
-        slicenumber=re.findall('[0-9]+',str(re.findall('slice[0-9]+_',png)))[0]
-        realslice=Image.open(glob.glob(os.path.join(realdir,'*'+slicenumber+'*'))[0]).convert('L')
+        fakeslice=Image.open(fake_png)
+        realslice=Image.open(real_png)
         
         if direction == 'real-fake':
             outslice=ImageChops.subtract(realslice,fakeslice)
@@ -31,7 +33,7 @@ def subtract_GAN_images(realdir, fakedir, subjid, direction, pngoutdir):
         if not os.path.exists(pngoutdir):
             os.makedirs(pngoutdir)
             
-        outslice.save(os.path.join(pngoutdir,subjid+'_slice'+slicenumber+'_'+direction+'.png'))
+        outslice.save(os.path.join(pngoutdir,fake_png.split('/')[-1]))
         
         
 parser = argparse.ArgumentParser(description='Creates difference images of synthetic and real modalities. Output will be PNGs.')
