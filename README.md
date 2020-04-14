@@ -17,7 +17,7 @@ GAN inspired by pix2pix (Isola, Zhu et al., 2016)
 (github repo: https://github.com/phillipi/pix2pix)  
 
 ## GAN example output
-#### T1 (left) - real FLAIR (middle) - synthetic FLAIR (right)
+#### real FLAIR - real T1 - synthetic FLAIR - synthetic T1
 <img src="./assets/example_outputs/T1_FLAIR_SYNTH-T1_SYNTH-FLAIR_00.gif" width=800 align="center">
 
 
