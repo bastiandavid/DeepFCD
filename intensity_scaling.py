@@ -17,9 +17,9 @@ from PIL import Image
 #from matplotlib import pyplot as plt
 from skimage.exposure import match_histograms
 
-SYNTHPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_FLAIR/'
-REALPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/'
-OUTPATH='/home/bdavid/Deep_Learning/playground/intensity_rescaled/'
+SYNTHPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_T1/'
+REALPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/'
+OUTPATH='/home/bdavid/Deep_Learning/playground/intensity_rescaled/T1_synth/test'
 
 def intensity_rescale(synth_img, real_img):
     
@@ -54,10 +54,12 @@ def histo_matching(synth_img, real_img):
 synth_list=glob.glob(os.path.join(SYNTHPATH,"test/*.png"))
 real_list=glob.glob(os.path.join(REALPATH,"test/*.png"))
 
+os.makedirs(OUTPATH, exist_ok=True)
+
 for synth_img, real_img in zip(synth_list, real_list):
     
     # synth_img_minmax_scaled= intensity_rescale(synth_img, real_img)
     # synth_img_minmax_scaled.save(os.path.join(OUTPATH,'test','minmax',synth_img.split('/')[-1]))
-    
+
     synth_img_histo_scaled = histo_matching(synth_img, real_img)
-    synth_img_histo_scaled.save(os.path.join(OUTPATH,'test',synth_img.split('/')[-1]))
+    synth_img_histo_scaled.save(os.path.join(OUTPATH,synth_img.split('/')[-1]))
