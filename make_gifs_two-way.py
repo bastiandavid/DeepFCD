@@ -19,7 +19,7 @@ SYNTHPATH1="/home/bdavid/Deep_Learning/playground/intensity_rescaled/FLAIR_synth
 SYNTHPATH2="/home/bdavid/Deep_Learning/playground/intensity_rescaled/T1_synth/test"
 OUTPATH="/home/bdavid/Deep_Learning/DeepFCD/assets/example_outputs"
 
-subjid="11362"
+subjid="555-nase"
 #set offset to not show face in GIFs
 offset=190
 
