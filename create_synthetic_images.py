@@ -33,8 +33,8 @@ TARGET_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor
 INPUT_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1_paddings/'
 
 INFILES='test/*.png'
-RAW_OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/raw_synth_FLAIR/'
-OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_FLAIR/'
+RAW_OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/raw_synth_FLAIR_11277/'
+OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_FLAIR_11277/'
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
@@ -212,7 +212,7 @@ test_dataset = tf.data.Dataset.list_files(INPUTPATH+INFILES, shuffle=False)
 test_dataset = test_dataset.map(load_image_test)
 test_dataset = test_dataset.batch(BATCH_SIZE)
 
-generator = tf.keras.models.load_model('./models/test_save/generator')
+generator = tf.keras.models.load_model(MODEL)
 
 os.makedirs(os.path.join(RAW_OUTPATH,'test'), exist_ok=True)
 
