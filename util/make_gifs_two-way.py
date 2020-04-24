@@ -15,8 +15,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 INPUTPATH="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/test"
 TARGETPATH="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/test"
-SYNTHPATH1="/home/bdavid/Deep_Learning/playground/intensity_rescaled/FLAIR_synth/test"
-SYNTHPATH2="/home/bdavid/Deep_Learning/playground/intensity_rescaled/T1_synth/test"
+SYNTHPATH1="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_FLAIR/test"
+SYNTHPATH2="/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_T1/test"
 OUTPATH="/home/bdavid/Deep_Learning/DeepFCD/assets/example_outputs"
 
 subjid="555-nase"
