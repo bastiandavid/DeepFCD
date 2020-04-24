@@ -20,8 +20,8 @@ import tensorflow as tf
 import os
 
 
-WEIGHTS = './checkpoints/T1_2_FLAIR_cor/ckpt-55'
-OUTPATH='./models/T1_2_FLAIR_cor'
+WEIGHTS = '../training_checkpoints/ckpt-109'
+OUTPATH='../models/FLAIR_2_T1_cor'
 
 # building the generator and discriminator to load the ckpt file, little redundant
 

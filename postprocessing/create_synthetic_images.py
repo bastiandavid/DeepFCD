@@ -25,16 +25,16 @@ from PIL import Image
 from IPython import display
 from skimage.exposure import match_histograms
 
-MODEL = './models/T1_2_FLAIR_cor/generator'
+MODEL = '../models/FLAIR_2_T1_cor/generator'
 
-TARGETPATH = '/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/'
-INPUTPATH ='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/'
-TARGET_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR_paddings/'
-INPUT_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1_paddings/'
+TARGETPATH = '/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/'
+INPUTPATH ='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/'
+TARGET_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1_paddings/'
+INPUT_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR_paddings/'
 
 INFILES='test/*.png'
-RAW_OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/raw_synth_FLAIR_11277/'
-OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_FLAIR_11277/'
+RAW_OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/raw_synth_T1/'
+OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_T1/'
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
