@@ -22,7 +22,6 @@ import os
 import numpy as np
 import glob
 from PIL import Image, ImageChops
-from IPython import display
 from skimage.exposure import match_histograms
 from tqdm import tqdm
 
@@ -31,7 +30,7 @@ DIRECTION = 'real-fake'
 INPUT_MODALITY = 'T1'
 TARGET_MODALITY = 'FLAIR'
 DATAPATH = '/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/png'
-SUBJID = '10346' # just single subject? if none given, all files are processed
+SUBJID = '555-nase' # just single subject? if none given, all files are processed
 DATASET = '' # test or train? just some directory prefix
 
 INFILES= SUBJID+'*.png' 
