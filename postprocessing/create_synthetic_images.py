@@ -3,7 +3,8 @@
 """
 Created on Wed Apr 22 16:06:35 2020
 
-Script to apply the trained generator network (U-net) to create synthetic MR-images.
+Script to apply the adversarially trained generator network (U-net) to create synthetic 
+MR-images.
 Images will be saved as PNGs. Images in RAW_OUTPATH are saved without post-hoc intensity
 scaling. I recommend using the images in OUTPATH instead, after histogram matching and
 intensity scaling for best results.
@@ -23,15 +24,23 @@ import numpy as np
 import glob
 from PIL import Image, ImageChops
 from skimage.exposure import match_histograms
+import nibabel as nib
 from tqdm import tqdm
+
+# -------- USER INPUT ----------
 
 MODEL = '../models/T1_2_FLAIR_cor/generator'
 DIRECTION = 'real-fake'
 INPUT_MODALITY = 'T1'
 TARGET_MODALITY = 'FLAIR'
 DATAPATH = '/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/png'
-SUBJID = '555-nase' # just single subject? if none given, all files are processed
+NIIPATH = '/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/nii'
+SUBJID = '' # just single subject? if none given, all files are processed
+CREATE_NIFTI = True # create niftis for input, synthetic and diff images?
 DATASET = '' # test or train? just some directory prefix
+
+#-------------------------------
+
 
 INFILES= SUBJID+'*.png' 
 TARGETPATH = os.path.join(DATAPATH,TARGET_MODALITY,DATASET,'')
@@ -39,16 +48,23 @@ INPUTPATH = os.path.join(DATAPATH,INPUT_MODALITY,DATASET,'')
 TARGET_PADDING_PATH= os.path.join(DATAPATH,TARGET_MODALITY+'_paddings',DATASET,'')
 INPUT_PADDING_PATH=os.path.join(DATAPATH,INPUT_MODALITY+'_paddings',DATASET,'')
 
-
 RAW_OUTPATH=os.path.join(DATAPATH,'raw_synth_'+TARGET_MODALITY,DATASET,'')
 if DIRECTION == 'real-fake':
     DIFF_OUTPATH=os.path.join(DATAPATH,'diff_'+'real_'+TARGET_MODALITY+
                          '-'+'synth_'+TARGET_MODALITY,DATASET,'')
+    DIFF_NII=os.path.join(NIIPATH,'diff_'+'real_'+TARGET_MODALITY+
+                         '-'+'synth_'+TARGET_MODALITY,DATASET,'')
 else:
     DIFF_OUTPATH=os.path.join(DATAPATH,'diff_'+'synth_'+TARGET_MODALITY+
                          '-'+'real_'+TARGET_MODALITY,DATASET,'')
+    DIFF_NII=os.path.join(NIIPATH,'diff_'+'synth_'+TARGET_MODALITY+
+                         '-'+'real_'+TARGET_MODALITY,DATASET,'')
 OUTPATH=os.path.join(DATAPATH,'synth_'+TARGET_MODALITY,DATASET,'')
 
+TARGET_NII = os.path.join(NIIPATH,TARGET_MODALITY,DATASET,'')
+INPUT_NII = os.path.join(NIIPATH,INPUT_MODALITY,DATASET,'')
+SYNTH_NII = os.path.join(NIIPATH,'synth_'+TARGET_MODALITY,DATASET,'')
+GAN_INPUT_NII = os.path.join(NIIPATH,'gan_input_'+INPUT_MODALITY,DATASET,'')
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
@@ -235,7 +251,24 @@ def subtract_images(synth_img, real_img, direction=DIRECTION):
         
     return out_img
 
+def to_nifti(subjid, realnii, inputdir, outname):
+    
+    real_nifti=nib.load(realnii)
 
+    first_slice=True
+    for png in sorted(glob.glob(os.path.join(inputdir, subjid+'*.png'))):
+        
+        curr_slice=np.array(Image.open(png).convert('L'))
+        #curr_slice=np.fliplr(np.flipud(curr_slice))
+        
+        if first_slice:
+            vol_array=curr_slice
+            first_slice=False
+        else:
+            vol_array=np.dstack((vol_array, curr_slice))
+            
+    final_nifti=nib.Nifti1Image(np.rot90(np.rot90(vol_array),axes=(2,1)), real_nifti.affine, header=real_nifti.header)
+    final_nifti.to_filename(outname)
 
 
 test_dataset = tf.data.Dataset.list_files(INPUTPATH+INFILES, shuffle=False)
@@ -279,3 +312,23 @@ for synth_img, real_img, i in zip(raw_synth_list, real_list, tqdm(range(len(raw_
     diff_img = subtract_images(synth_img_histo_scaled, real_img)
     synth_img_histo_scaled.save(os.path.join(OUTPATH,synth_img.split('/')[-1]))
     diff_img.save(os.path.join(DIFF_OUTPATH,synth_img.split('/')[-1]))
+    
+if CREATE_NIFTI:
+    
+    os.makedirs(os.path.join(SYNTH_NII), exist_ok=True)
+    os.makedirs(os.path.join(DIFF_NII), exist_ok=True)
+    os.makedirs(os.path.join(GAN_INPUT_NII), exist_ok=True)
+    
+    subjids=set([os.path.basename(img).split('/')[-1].split('_')[0]
+                 for img in glob.glob(os.path.join(INPUTPATH,INFILES))])
+    
+    for sbj in tqdm(subjids):
+        
+        to_nifti(sbj, TARGET_NII+sbj+'_'+TARGET_MODALITY+'.nii.gz',
+                 OUTPATH, SYNTH_NII+sbj+'_synth_'+TARGET_MODALITY)
+        
+        to_nifti(sbj, TARGET_NII+sbj+'_'+TARGET_MODALITY+'.nii.gz',
+                 DIFF_OUTPATH, DIFF_NII+sbj+'_diff')
+        
+        to_nifti(sbj, INPUT_NII+sbj+'_'+INPUT_MODALITY+'.nii.gz',
+                 INPUTPATH, GAN_INPUT_NII+sbj+'_gan-input_'+INPUT_MODALITY)
