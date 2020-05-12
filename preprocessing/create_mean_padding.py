@@ -19,11 +19,12 @@ if INPUT_CHANNELS % 2 == 0:
     print('Even no. of slices not supported, setting INPUT_CHANNELS to ',INPUT_CHANNELS+1)
     INPUT_CHANNELS += 1
 
-OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_axial/'
-INPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_axial/'
+OUTPATH='/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/png'
+INPATH='/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/png'
 modalities = ['FLAIR','T1']
 
-folders=['test','train']
+#folders=['test','train']
+folders=['']
 subjid=re.compile('([0-9]+)_')
 for modality in modalities:
     
