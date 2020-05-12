@@ -21,20 +21,35 @@ import tensorflow as tf
 import os
 import numpy as np
 import glob
-from PIL import Image
+from PIL import Image, ImageChops
 from IPython import display
 from skimage.exposure import match_histograms
+from tqdm import tqdm
 
-MODEL = '../models/FLAIR_2_T1_cor/generator'
+MODEL = '../models/T1_2_FLAIR_cor/generator'
+DIRECTION = 'real-fake'
+INPUT_MODALITY = 'T1'
+TARGET_MODALITY = 'FLAIR'
+DATAPATH = '/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/png'
+SUBJID = '10346' # just single subject? if none given, all files are processed
+DATASET = '' # test or train? just some directory prefix
 
-TARGETPATH = '/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1/'
-INPUTPATH ='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR/'
-TARGET_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/T1_paddings/'
-INPUT_PADDING_PATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/FLAIR_paddings/'
+INFILES= SUBJID+'*.png' 
+TARGETPATH = os.path.join(DATAPATH,TARGET_MODALITY,DATASET,'')
+INPUTPATH = os.path.join(DATAPATH,INPUT_MODALITY,DATASET,'')
+TARGET_PADDING_PATH= os.path.join(DATAPATH,TARGET_MODALITY+'_paddings',DATASET,'')
+INPUT_PADDING_PATH=os.path.join(DATAPATH,INPUT_MODALITY+'_paddings',DATASET,'')
 
-INFILES='test/*.png'
-RAW_OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/raw_synth_T1/'
-OUTPATH='/home/bdavid/Deep_Learning/playground/fake_flair_2d/png_cor/synth_T1/'
+
+RAW_OUTPATH=os.path.join(DATAPATH,'raw_synth_'+TARGET_MODALITY,DATASET,'')
+if DIRECTION == 'real-fake':
+    DIFF_OUTPATH=os.path.join(DATAPATH,'diff_'+'real_'+TARGET_MODALITY+
+                         '-'+'synth_'+TARGET_MODALITY,DATASET,'')
+else:
+    DIFF_OUTPATH=os.path.join(DATAPATH,'diff_'+'synth_'+TARGET_MODALITY+
+                         '-'+'real_'+TARGET_MODALITY,DATASET,'')
+OUTPATH=os.path.join(DATAPATH,'synth_'+TARGET_MODALITY,DATASET,'')
+
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
@@ -208,38 +223,60 @@ def histo_matching(synth_img, real_img):
     
     return Image.fromarray(np.uint8(synth_img_scaled))
 
+def subtract_images(synth_img, real_img, direction=DIRECTION):
+    
+ 
+#    synth_img=Image.open(synth_img)
+    real_img=Image.open(real_img)
+    
+    if direction == 'real-fake':
+        out_img=ImageChops.subtract(real_img,synth_img)
+    elif direction == 'fake-real':
+        out_img=ImageChops.subtract(synth_img,real_img)
+        
+    return out_img
+
+
+
+
 test_dataset = tf.data.Dataset.list_files(INPUTPATH+INFILES, shuffle=False)
 test_dataset = test_dataset.map(load_image_test)
 test_dataset = test_dataset.batch(BATCH_SIZE)
 
 generator = tf.keras.models.load_model(MODEL)
 
-os.makedirs(os.path.join(RAW_OUTPATH,'test'), exist_ok=True)
+os.makedirs(os.path.join(RAW_OUTPATH), exist_ok=True)
 
 # Run the trained model on a few examples from the test dataset
-for (inp, tar), path in zip(test_dataset,
-                            tf.data.Dataset.list_files(INPUTPATH+INFILES,shuffle=False)):
+print()
+for (inp, tar), path, i in zip(test_dataset,
+                            tf.data.Dataset.list_files(INPUTPATH+INFILES,shuffle=False),
+                            tqdm(range(len(glob.glob(os.path.join(TARGETPATH,INFILES)))),
+                                 desc='Creating raw synthetic images')):
     
   prediction = generator(inp, training=True)
 
   outfile = tf.strings.regex_replace(path,INPUTPATH,RAW_OUTPATH)
-  display.clear_output(wait=True)
-  print('writing '+outfile.numpy().decode("utf-8").split('/')[-1])
+  #print('\rwriting '+outfile.numpy().decode("utf-8").split('/')[-1], end='')
   tf.keras.preprocessing.image.save_img(outfile.numpy(), prediction[0], file_format='png')
 
   
-raw_synth_list=glob.glob(os.path.join(RAW_OUTPATH,INFILES))
-real_list=glob.glob(os.path.join(TARGETPATH,INFILES))
+raw_synth_list=sorted(glob.glob(os.path.join(RAW_OUTPATH,INFILES)))
+real_list=sorted(glob.glob(os.path.join(TARGETPATH,INFILES)))
 
-os.makedirs(os.path.join(OUTPATH,'test'), exist_ok=True)
+os.makedirs(os.path.join(OUTPATH), exist_ok=True)
+os.makedirs(os.path.join(DIFF_OUTPATH), exist_ok=True)
 
-for synth_img, real_img in zip(raw_synth_list, real_list):
+print()
+for synth_img, real_img, i in zip(raw_synth_list, real_list, tqdm(range(len(raw_synth_list)),
+                                 desc='Creating final synthetic and diff images')):
     
     # MinMax Intensity scaling (not recommended):
     # synth_img_minmax_scaled= intensity_rescale(synth_img, real_img)
     # synth_img_minmax_scaled.save(os.path.join(OUTPATH,'test','minmax',synth_img.split('/')[-1]))
     
-    display.clear_output(wait=True)
-    print('writing '+synth_img.split('/')[-1])
+    #print('\rwriting '+synth_img.split('/')[-1], end='')
     synth_img_histo_scaled = histo_matching(synth_img, real_img)
-    synth_img_histo_scaled.save(os.path.join(OUTPATH,'test',synth_img.split('/')[-1]))
+    diff_img = subtract_images(synth_img_histo_scaled, real_img)
+    synth_img_histo_scaled.save(os.path.join(OUTPATH,synth_img.split('/')[-1]))
+    diff_img.save(os.path.join(DIFF_OUTPATH,synth_img.split('/')[-1]))
