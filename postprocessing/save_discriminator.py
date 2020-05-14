@@ -164,4 +164,4 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 # restoring the best checkpoint (early stopping) in checkpoint_dir
 checkpoint.restore(WEIGHTS)
 
-generator.save(os.path.join(OUTPATH,'generator'))
+discriminator.save(os.path.join(OUTPATH,'discriminator'))
