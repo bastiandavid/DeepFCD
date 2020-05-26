@@ -23,7 +23,7 @@ mkdir -p $MATRICES_DIR $MASK_DIR $DEEPMEDIC_INPUT $tmp_dir
 
 # define subjects
 #SUBJECTS=$(ls ${T1_DIR}| cut -d'_' -f1)
-SUBJECTS=555-nase
+SUBJECTS=11375
 
 echo ""
 echo "#########################################################################"
@@ -35,11 +35,11 @@ do
   echo "Processing $sbj"
   echo "registration"
 
-  flirt -in ${GAN_INPUT_T1_DIR}/${sbj}* -ref ${REAL_T1_DIR}/T1/${sbj}_T1.nii.gz -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
+  flirt -in ${GAN_INPUT_T1_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
 
-  flirt -in ${DIFF_DIR}/${sbj}* -ref ${REAL_T1_DIR}/T1/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
+  flirt -in ${DIFF_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
   echo "fast"
-  fast -g -o ${tmp_dir}/${sbj} ${REAL_T1_DIR}/T1/${sbj}_T1.nii.gz
+  fast -g -o ${tmp_dir}/${sbj} ${REAL_T1_DIR}/${sbj}_T1.nii.gz
 
   fslmaths ${tmp_dir}/${sbj}_seg_1 -add ${tmp_dir}/${sbj}_seg_2 ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -fillh ${tmp_dir}/${sbj}_gmwm
