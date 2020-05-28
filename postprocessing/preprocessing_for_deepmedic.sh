@@ -35,14 +35,14 @@ do
   flirt -in ${GAN_INPUT_T1_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
 
   flirt -in ${DIFF_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
-  echo "fast"
+
   bet ${REAL_T1_DIR}/${sbj}_T1.nii.gz ${tmp_dir}/${sbj}_bet_T1 -R
   fast -g -o ${tmp_dir}/${sbj} ${tmp_dir}/${sbj}_bet_T1
 
   fslmaths ${tmp_dir}/${sbj}_seg_1 -add ${tmp_dir}/${sbj}_seg_2 ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -fillh ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -kernel sphere 1 -ero ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded
-  echo "normalization"
+
   # normalizing difference
   read -r mean std <<< $(fslstats ${DEEPMEDIC_INPUT}/${sbj}_diff -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
 
