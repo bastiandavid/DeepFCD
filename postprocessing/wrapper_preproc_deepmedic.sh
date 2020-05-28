@@ -12,6 +12,10 @@ echo ""
 # define subjects here
 SUBJECTS=555-nase
 
+# temporary directory
+BASE_DIR=/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/nii
+tmp_dir=${BASE_DIR}/tmp
+
 max_cores=$(grep -c ^processor /proc/cpuinfo)
 echo "How many cores shall be used? [1-$max_cores]:"
 read cores
@@ -38,3 +42,7 @@ echo ""
 
 
 echo $SUBJECTS | xargs -n 1 -P $cores ./preprocessing_for_deepmedic.sh #| grep "Processing"
+
+echo ""
+echo "All done. Cleaning directory."
+rm -rf ${tmp_dir}

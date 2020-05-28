@@ -91,5 +91,7 @@ do
 
   fslmaths ${tmp_dir}/${sbj}_weights_reg -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_weights
 
+  # cleaning up temporary directory
+  rm ${tmp_dir}/*${sbj}*
 
 done
