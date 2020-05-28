@@ -64,6 +64,7 @@ OUTPATH=os.path.join(DATAPATH,'synth_'+TARGET_MODALITY,DATASET,'')
 TARGET_NII = os.path.join(NIIPATH,TARGET_MODALITY,DATASET,'')
 INPUT_NII = os.path.join(NIIPATH,INPUT_MODALITY,DATASET,'')
 SYNTH_NII = os.path.join(NIIPATH,'synth_'+TARGET_MODALITY,DATASET,'')
+GAN_TARGET_NII = os.path.join(NIIPATH, 'gan_target_'+TARGET_MODALITY,DATASET,'')
 GAN_INPUT_NII = os.path.join(NIIPATH,'gan_input_'+INPUT_MODALITY,DATASET,'')
 
 BUFFER_SIZE = 400
@@ -318,6 +319,7 @@ if CREATE_NIFTI:
     os.makedirs(os.path.join(SYNTH_NII), exist_ok=True)
     os.makedirs(os.path.join(DIFF_NII), exist_ok=True)
     os.makedirs(os.path.join(GAN_INPUT_NII), exist_ok=True)
+    os.makedirs(os.path.join(GAN_TARGET_NII), exist_ok=True)
     
     subjids=set([os.path.basename(img).split('/')[-1].split('_')[0]
                  for img in glob.glob(os.path.join(INPUTPATH,INFILES))])
@@ -332,3 +334,6 @@ if CREATE_NIFTI:
         
         to_nifti(sbj, INPUT_NII+sbj+'_'+INPUT_MODALITY+'.nii.gz',
                  INPUTPATH, GAN_INPUT_NII+sbj+'_gan-input_'+INPUT_MODALITY)
+        
+        to_nifti(sbj, TARGET_NII+sbj+'_'+TARGET_MODALITY+'.nii.gz',
+                 TARGETPATH, GAN_TARGET_NII+sbj+'_gan-target_'+TARGET_MODALITY)
