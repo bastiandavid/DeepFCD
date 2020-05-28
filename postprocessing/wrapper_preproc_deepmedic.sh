@@ -37,4 +37,4 @@ echo "Processing list:"
 echo ""
 
 
-xargs -a $SUBJECTS -n 1 -P $cores ./preprocessing_for_deepmedic.sh #| grep "Processing"
+echo $SUBJECTS | xargs -n 1 -P $cores ./preprocessing_for_deepmedic.sh #| grep "Processing"
