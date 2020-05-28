@@ -11,7 +11,7 @@ BASE_DIR=/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/nii
 REAL_T1_DIR=${BASE_DIR}/T1
 REAL_FLAIR_DIR=${BASE_DIR}/FLAIR
 GAN_INPUT_T1_DIR=${BASE_DIR}/gan_input_T1
-GAN_INPUT_FLAIR_DIR=${BASE_DIR}/gan_input_FLAIR
+GAN_TARGET_FLAIR_DIR=${BASE_DIR}/gan_target_FLAIR
 SYNTH_FLAIR_DIR=${BASE_DIR}/synth_FLAIR
 DIFF_DIR=${BASE_DIR}/diff_real_FLAIR-synth_FLAIR
 MAP_DIR=${BASE_DIR}/MAP_DeepFCD
@@ -83,7 +83,7 @@ do
   fslmaths ${tmp_dir}/T1_${sbj}_thickness_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_thickness
 
   # creating weight map using mri_robust_register
-  mri_robust_register --mov ${GAN_INPUT_FLAIR_DIR}/${sbj}* --dst ${SYNTH_FLAIR_DIR}/${sbj}* --lta ${tmp_dir}/${sbj}.lta --weights  ${tmp_dir}/${sbj}_weights.nii --satit
+  mri_robust_register --mov ${GAN_TARGET_FLAIR_DIR}/${sbj}* --dst ${SYNTH_FLAIR_DIR}/${sbj}* --lta ${tmp_dir}/${sbj}.lta --weights ${tmp_dir}/${sbj}_weights.nii --satit
 
   flirt -in ${tmp_dir}/${sbj}_weights.nii -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sbj}_weights_reg
 
