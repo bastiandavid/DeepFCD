@@ -9,13 +9,15 @@ echo "#################       PRE-DEEPMEDIC PROCESSING       ##################"
 echo "#########################################################################"
 echo ""
 
-# define subjects here
-SUBJECTS=$(ls ${T1_DIR}| cut -d'_' -f1)
 
 # temporary directory
 BASE_DIR=/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/nii
+REAL_T1_DIR=${BASE_DIR}/T1
 MATRICES_DIR=${BASE_DIR}/matrices
 tmp_dir=${BASE_DIR}/tmp
+
+# define subjects here
+SUBJECTS=$(ls ${REAL_T1_DIR}| cut -d'_' -f1)
 
 max_cores=$(grep -c ^processor /proc/cpuinfo)
 echo "How many cores shall be used? [1-$max_cores]:"
