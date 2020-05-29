@@ -18,20 +18,22 @@ MAP_DIR=${BASE_DIR}/MAP_DeepFCD
 
 # make output directories
 MATRICES_DIR=${BASE_DIR}/matrices
-MASK_DIR=${BASE_DIR}/masks
 DEEPMEDIC_INPUT=${BASE_DIR}/deepmedic_input
 tmp_dir=${BASE_DIR}/tmp
-mkdir -p $MATRICES_DIR $MASK_DIR $DEEPMEDIC_INPUT $tmp_dir
+mkdir -p $MATRICES_DIR $DEEPMEDIC_INPUT $tmp_dir
 
 # define subjects (not necessary if using parallelized wrapper script)
 #SUBJECTS=$(ls ${T1_DIR}| cut -d'_' -f1)
 SUBJECTS=$1
 
+# define ROIs not being purged (filtering out mostly subcortical structures in this step)
+rois="3 2 24 41 42 77 78 79 80 81 82 100 109"
+
 for sbj in $SUBJECTS
 do
   echo "Processing $sbj"
-  echo "registration"
 
+  
   flirt -in ${GAN_INPUT_T1_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
 
   flirt -in ${DIFF_DIR}/${sbj}* -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
@@ -41,8 +43,30 @@ do
 
   fslmaths ${tmp_dir}/${sbj}_seg_1 -add ${tmp_dir}/${sbj}_seg_2 ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -fillh ${tmp_dir}/${sbj}_gmwm
-  fslmaths ${tmp_dir}/${sbj}_gmwm -kernel sphere 1 -ero ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded
+  fslmaths ${tmp_dir}/${sbj}_gmwm -kernel sphere 1 -ero ${tmp_dir}/${sbj}_gmwm_eroded
 
+  samseg --t1w ${REAL_T1_DIR}/${sbj}_T1.nii.gz --flair ${REAL_FLAIR_DIR}/${sbj}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
+  
+  mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${REAL_T1_DIR}/${sbj}_T1.nii.gz --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
+  
+  fslmaths ${tmp_dir}/${sbj}/seg_reg.nii -mul 0 ${tmp_dir}/${sbj}_only_cortical_structures
+
+  for roi in $rois
+  do
+    
+    fslmaths ${tmp_dir}/${sbj}/seg_reg.nii -thr ${roi} -uthr ${roi} -bin ${tmp_dir}/${sbj}_roi_tmp
+    fslmaths ${tmp_dir}/${sbj}_only_cortical_structures -add ${tmp_dir}/${sbj}_roi_tmp ${tmp_dir}/${sbj}_only_cortical_structures
+    
+  done
+  
+  fslmaths ${tmp_dir}/${sbj}_gmwm_eroded -mul ${tmp_dir}/${sbj}_only_cortical_structures ${tmp_dir}/${sbj}_gmwm_eroded
+  
+  fslmaths ${tmp_dir}/${sbj}_gmwm_eroded -kernel sphere 1 -ero ${tmp_dir}/${sbj}_gmwm_eroded_ero
+  fslmaths ${tmp_dir}/${sbj}_gmwm_eroded_ero -kernel sphere 1 -dilF ${DEEPMEDIC_INPUT}/${sbj}_mask
+  
+  # intermediate cleaning
+  #rm -rf ${tmp_dir}/${sbj}
+  
   # normalizing difference
   read -r mean std <<< $(fslstats ${DEEPMEDIC_INPUT}/${sbj}_diff -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
 
@@ -92,6 +116,6 @@ do
   fslmaths ${tmp_dir}/${sbj}_weights_reg -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_weights
 
   # cleaning up temporary directory
-  rm ${tmp_dir}/*${sbj}*
+  rm -rf ${tmp_dir}/*${sbj}* ${MATRICES_DIR}/*${sbj}
 
 done

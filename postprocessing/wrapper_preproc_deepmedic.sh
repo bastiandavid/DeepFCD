@@ -10,10 +10,11 @@ echo "#########################################################################"
 echo ""
 
 # define subjects here
-SUBJECTS=555-nase
+SUBJECTS=$(ls ${T1_DIR}| cut -d'_' -f1)
 
 # temporary directory
 BASE_DIR=/home/bdavid/Deep_Learning/data/bonn/FCD/iso_FLAIR/nii
+MATRICES_DIR=${BASE_DIR}/matrices
 tmp_dir=${BASE_DIR}/tmp
 
 max_cores=$(grep -c ^processor /proc/cpuinfo)
@@ -41,8 +42,8 @@ echo "Processing list:"
 echo ""
 
 
-echo $SUBJECTS | xargs -n 1 -P $cores ./preprocessing_for_deepmedic.sh #| grep "Processing"
+echo $SUBJECTS | xargs -n 1 -P $cores ./preprocessing_for_deepmedic.sh | grep "Processing"
 
 echo ""
 echo "All done. Cleaning directory."
-rm -rf ${tmp_dir}
+rm -rf ${tmp_dir} ${MATRICES_DIR}
