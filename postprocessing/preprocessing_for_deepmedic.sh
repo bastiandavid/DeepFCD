@@ -68,17 +68,17 @@ do
   #rm -rf ${tmp_dir}/${sbj}
   
   # normalizing difference
-  read -r mean std <<< $(fslstats ${DEEPMEDIC_INPUT}/${sbj}_diff -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${DEEPMEDIC_INPUT}/${sbj}_diff -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${DEEPMEDIC_INPUT}/${sbj}_diff -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_diff
+  fslmaths ${DEEPMEDIC_INPUT}/${sbj}_diff -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_diff
 
   # normalizing T1
-  read -r mean std <<< $(fslstats ${REAL_T1_DIR}/${sbj}* -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${REAL_T1_DIR}/${sbj}* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
   fslmaths ${REAL_T1_DIR}/${sbj}* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_T1
 
   # normalizing FLAIR
-  read -r mean std <<< $(fslstats ${REAL_FLAIR_DIR}/${sbj}* -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${REAL_FLAIR_DIR}/${sbj}* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
   fslmaths ${REAL_FLAIR_DIR}/${sbj}* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
 
@@ -86,34 +86,34 @@ do
   imcp ${MAP_DIR}/T1_${sbj}_junction_z_score ${tmp_dir}/
   fslcpgeom ${REAL_T1_DIR}/${sbj}_T1.nii.gz ${tmp_dir}/T1_${sbj}_junction_z_score
 
-  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_junction_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_junction_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/T1_${sbj}_junction_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_junction
+  fslmaths ${tmp_dir}/T1_${sbj}_junction_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_junction
 
   # normalizing extension map
   imcp ${MAP_DIR}/T1_${sbj}_extension_z_score ${tmp_dir}/
   fslcpgeom ${REAL_T1_DIR}/${sbj}_T1.nii.gz ${tmp_dir}/T1_${sbj}_extension_z_score
 
-  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_extension_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_extension_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/T1_${sbj}_extension_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_extension
+  fslmaths ${tmp_dir}/T1_${sbj}_extension_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_extension
 
   # normalzing thickness map
   imcp ${MAP_DIR}/T1_${sbj}_thickness_z_score ${tmp_dir}/
   fslcpgeom ${REAL_T1_DIR}/${sbj}_T1.nii.gz ${tmp_dir}/T1_${sbj}_thickness_z_score
 
-  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_thickness_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_thickness_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/T1_${sbj}_thickness_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_thickness
+  fslmaths ${tmp_dir}/T1_${sbj}_thickness_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_thickness
 
   # creating weight map using mri_robust_register
   mri_robust_register --mov ${GAN_TARGET_FLAIR_DIR}/${sbj}* --dst ${SYNTH_FLAIR_DIR}/${sbj}* --lta ${tmp_dir}/${sbj}.lta --weights ${tmp_dir}/${sbj}_weights.nii --satit
 
   flirt -in ${tmp_dir}/${sbj}_weights.nii -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sbj}_weights_reg
 
-  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_weights_reg -k ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_weights_reg -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/${sbj}_weights_reg -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_gmwm_eroded ${DEEPMEDIC_INPUT}/${sbj}_weights
+  fslmaths ${tmp_dir}/${sbj}_weights_reg -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_weights
 
   # cleaning up temporary directory
   rm -rf ${tmp_dir}/*${sbj}* ${MATRICES_DIR}/*${sbj}
