@@ -34,26 +34,26 @@ for sbj in $SUBJECTS
 do
   echo "Processing $sbj"
 
-  flirt -in ${REAL_T1_DIR}/${sbj}_T1.nii.gz -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sjb}_T1
+  flirt -in ${REAL_T1_DIR}/${sbj}_T1.nii.gz -ref ${REAL_T1_DIR}/${sbj}_T1.nii.gz -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sbj}_T1
 
-  flirt -in ${REAL_FLAIR_DIR}/${sbj}_FLAIR.nii.gz -ref ${tmp_dir}/${sjb}_T1 -omat ${MATRICES_DIR}/${sbj}_FLAIR_2_T1.mat -out ${tmp_dir}/${sjb}_FLAIR -noresampblur -interp spline
+  flirt -in ${REAL_FLAIR_DIR}/${sbj}_FLAIR.nii.gz -ref ${tmp_dir}/${sbj}_T1 -omat ${MATRICES_DIR}/${sbj}_FLAIR_2_T1.mat -out ${tmp_dir}/${sbj}_FLAIR -noresampblur -interp spline
 
-  flirt -in ${ROI_DIR}/${sbj}_roi -ref ${tmp_dir}/${sjb}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_FLAIR_2_T1.mat -out ${DEEPMEDIC_INPUT}/${sjb}_roi -interp nearestneighbour
+  flirt -in ${ROI_DIR}/${sbj}_roi -ref ${tmp_dir}/${sbj}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_FLAIR_2_T1.mat -out ${DEEPMEDIC_INPUT}/${sbj}_roi -interp nearestneighbour
 
-  flirt -in ${GAN_INPUT_T1_DIR}/${sbj}_* -ref ${tmp_dir}/${sjb}_T1 -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
+  flirt -in ${GAN_INPUT_T1_DIR}/${sbj}_* -ref ${tmp_dir}/${sbj}_T1 -omat ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline
 
-  flirt -in ${DIFF_DIR}/${sbj}_* -ref ${tmp_dir}/${sjb}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
+  flirt -in ${DIFF_DIR}/${sbj}_* -ref ${tmp_dir}/${sbj}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${DEEPMEDIC_INPUT}/${sbj}_diff
 
-  bet ${tmp_dir}/${sjb}_T1 ${tmp_dir}/${sbj}_bet_T1 -R
+  bet ${tmp_dir}/${sbj}_T1 ${tmp_dir}/${sbj}_bet_T1 -R
   fast -g -o ${tmp_dir}/${sbj} ${tmp_dir}/${sbj}_bet_T1
 
   fslmaths ${tmp_dir}/${sbj}_seg_1 -add ${tmp_dir}/${sbj}_seg_2 ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -fillh ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -kernel sphere 1 -ero ${tmp_dir}/${sbj}_gmwm_eroded
 
-  samseg --t1w ${tmp_dir}/${sjb}_T1 --flair ${tmp_dir}/${sjb}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
+  samseg --t1w ${tmp_dir}/${sbj}_T1 --flair ${tmp_dir}/${sbj}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
 
-  mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${tmp_dir}/${sjb}_T1 --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
+  mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${tmp_dir}/${sbj}_T1 --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
 
   fslmaths ${tmp_dir}/${sbj}/seg_reg.nii -mul 0 ${tmp_dir}/${sbj}_only_cortical_structures
 
@@ -79,19 +79,19 @@ do
   fslmaths ${DEEPMEDIC_INPUT}/${sbj}_diff -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_diff
 
   # normalizing T1
-  read -r mean std <<< $(fslstats ${tmp_dir}/${sjb}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/${sjb}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_T1
+  fslmaths ${tmp_dir}/${sbj}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_T1
 
   # normalizing FLAIR
-  read -r mean std <<< $(fslstats ${tmp_dir}/${sjb}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/${sjb}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
+  fslmaths ${tmp_dir}/${sbj}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
 
   # normalizing junction map
   flirt -in ${MAP_DIR}/T1_${sbj}_junction_z_score -ref ${MAP_DIR}/T1_${sbj}_junction_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_junction_z_score
 
-  fslcpgeom ${tmp_dir}/${sjb}_T1 ${tmp_dir}/T1_${sbj}_junction_z_score
+  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_junction_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_junction_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
@@ -100,7 +100,7 @@ do
   # normalizing extension map
   flirt -in ${MAP_DIR}/T1_${sbj}_extension_z_score -ref ${MAP_DIR}/T1_${sbj}_extension_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_extension_z_score
 
-  fslcpgeom ${tmp_dir}/${sjb}_T1 ${tmp_dir}/T1_${sbj}_extension_z_score
+  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_extension_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_extension_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
@@ -109,7 +109,7 @@ do
   # normalzing thickness map
   flirt -in ${MAP_DIR}/T1_${sbj}_thickness_z_score -ref ${MAP_DIR}/T1_${sbj}_thickness_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_thickness_z_score
 
-  fslcpgeom ${tmp_dir}/${sjb}_T1 ${tmp_dir}/T1_${sbj}_thickness_z_score
+  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_thickness_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_thickness_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
@@ -118,7 +118,7 @@ do
   # creating weight map using mri_robust_register
   mri_robust_register --mov ${GAN_TARGET_FLAIR_DIR}/${sbj}_* --dst ${SYNTH_FLAIR_DIR}/${sbj}_* --lta ${tmp_dir}/${sbj}.lta --weights ${tmp_dir}/${sbj}_weights.nii --satit
 
-  flirt -in ${tmp_dir}/${sbj}_weights.nii -ref ${tmp_dir}/${sjb}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sbj}_weights_reg
+  flirt -in ${tmp_dir}/${sbj}_weights.nii -ref ${tmp_dir}/${sbj}_T1 -applyxfm -init ${MATRICES_DIR}/${sbj}_gan_input_T1_2_T1.mat -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/${sbj}_weights_reg
 
   read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_weights_reg -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
