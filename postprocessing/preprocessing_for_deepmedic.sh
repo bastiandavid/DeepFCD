@@ -51,7 +51,7 @@ do
   fslmaths ${tmp_dir}/${sbj}_gmwm -fillh ${tmp_dir}/${sbj}_gmwm
   fslmaths ${tmp_dir}/${sbj}_gmwm -kernel sphere 1 -ero ${tmp_dir}/${sbj}_gmwm_eroded
 
-  samseg --t1w ${tmp_dir}/${sbj}_T1 --flair ${tmp_dir}/${sbj}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
+  samseg --t1w ${tmp_dir}/${sbj}_T1.nii.gz --flair ${tmp_dir}/${sbj}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
 
   mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${tmp_dir}/${sbj}_T1 --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
 
