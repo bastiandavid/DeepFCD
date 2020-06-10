@@ -53,7 +53,7 @@ do
 
   samseg --t1w ${tmp_dir}/${sbj}_T1.nii.gz --flair ${tmp_dir}/${sbj}_FLAIR.nii.gz --refmode t1w --o ${tmp_dir}/${sbj} --no-save-warp --threads 1 --pallidum-separate
 
-  mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${tmp_dir}/${sbj}_T1 --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
+  mri_label2vol --seg ${tmp_dir}/${sbj}/seg.mgz --temp ${tmp_dir}/${sbj}_T1.nii.gz --o ${tmp_dir}/${sbj}/seg_reg.nii --regheader ${tmp_dir}/${sbj}/seg.mgz
 
   fslmaths ${tmp_dir}/${sbj}/seg_reg.nii -mul 0 ${tmp_dir}/${sbj}_only_cortical_structures
 
@@ -79,14 +79,14 @@ do
   fslmaths ${DEEPMEDIC_INPUT}/${sbj}_diff -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_diff
 
   # normalizing T1
-  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_T1 -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/${sbj}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_T1
+  fslmaths ${tmp_dir}/${sbj}_T1 -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_T1
 
   # normalizing FLAIR
-  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_* -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
+  read -r mean std <<< $(fslstats ${tmp_dir}/${sbj}_FLAIR -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
-  fslmaths ${tmp_dir}/${sbj}_* -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
+  fslmaths ${tmp_dir}/${sbj}_FLAIR -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
 
   # normalizing junction map
   flirt -in ${MAP_DIR}/T1_${sbj}_junction_z_score -ref ${MAP_DIR}/T1_${sbj}_junction_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_junction_z_score
