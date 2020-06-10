@@ -89,27 +89,30 @@ do
   fslmaths ${tmp_dir}/${sbj}_FLAIR -sub $mean -div $std ${DEEPMEDIC_INPUT}/${sbj}_FLAIR
 
   # normalizing junction map
-  flirt -in ${MAP_DIR}/T1_${sbj}_junction_z_score -ref ${MAP_DIR}/T1_${sbj}_junction_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_junction_z_score
+  imcp ${MAP_DIR}/T1_${sbj}_junction_z_score ${tmp_dir}/T1_${sbj}_junction_z_score
+  fslcpgeom ${REAL_T1_DIR}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_junction_z_score
 
-  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_junction_z_score
+  flirt -in ${tmp_dir}/T1_${sbj}_junction_z_score -ref ${tmp_dir}/T1_${sbj}_junction_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_junction_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_junction_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
   fslmaths ${tmp_dir}/T1_${sbj}_junction_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_junction
 
   # normalizing extension map
-  flirt -in ${MAP_DIR}/T1_${sbj}_extension_z_score -ref ${MAP_DIR}/T1_${sbj}_extension_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_extension_z_score
+  imcp ${MAP_DIR}/T1_${sbj}_extension_z_score ${tmp_dir}/T1_${sbj}_extension_z_score
+  fslcpgeom ${REAL_T1_DIR}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_extension_z_score
 
-  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_extension_z_score
+  flirt -in ${tmp_dir}/T1_${sbj}_extension_z_score -ref ${tmp_dir}/T1_${sbj}_extension_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_extension_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_extension_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
   fslmaths ${tmp_dir}/T1_${sbj}_extension_z_score -sub $mean -div $std -mul ${DEEPMEDIC_INPUT}/${sbj}_mask ${DEEPMEDIC_INPUT}/${sbj}_extension
 
   # normalzing thickness map
-  flirt -in ${MAP_DIR}/T1_${sbj}_thickness_z_score -ref ${MAP_DIR}/T1_${sbj}_thickness_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_thickness_z_score
+  imcp ${MAP_DIR}/T1_${sbj}_thickness_z_score ${tmp_dir}/T1_${sbj}_thickness_z_score
+  fslcpgeom ${REAL_T1_DIR}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_thickness_z_score
 
-  fslcpgeom ${tmp_dir}/${sbj}_T1 ${tmp_dir}/T1_${sbj}_thickness_z_score
+  flirt -in ${tmp_dir}/T1_${sbj}_thickness_z_score -ref ${tmp_dir}/T1_${sbj}_thickness_z_score -applyisoxfm 0.8 -nosearch -noresampblur -cost normmi -interp spline -out ${tmp_dir}/T1_${sbj}_thickness_z_score
 
   read -r mean std <<< $(fslstats ${tmp_dir}/T1_${sbj}_thickness_z_score -k ${DEEPMEDIC_INPUT}/${sbj}_mask -m -s)
 
