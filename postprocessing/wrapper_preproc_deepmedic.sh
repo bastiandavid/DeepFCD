@@ -18,6 +18,7 @@ tmp_dir=${BASE_DIR}/tmp
 
 # define subjects here
 SUBJECTS=$(ls ${REAL_T1_DIR}| cut -d'_' -f1)
+#SUBJECTS=3022
 
 max_cores=$(grep -c ^processor /proc/cpuinfo)
 echo "How many cores shall be used? [1-$max_cores]:"
