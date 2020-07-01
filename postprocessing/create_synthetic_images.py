@@ -257,7 +257,7 @@ def to_nifti(subjid, realnii, inputdir, outname):
     real_nifti=nib.load(realnii)
 
     first_slice=True
-    for png in sorted(glob.glob(os.path.join(inputdir, subjid+'*.png'))):
+    for png in sorted(glob.glob(os.path.join(inputdir, subjid+'_*.png'))):
         
         curr_slice=np.array(Image.open(png).convert('L'))
         #curr_slice=np.fliplr(np.flipud(curr_slice))
