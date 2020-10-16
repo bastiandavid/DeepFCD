@@ -10,7 +10,7 @@ Nibabel 2.5.1
 Numpy 1.17.2  
 PIL 6.2.0  
 
-### For 3D-GAN and 3D-CNN training:
+### For multi-channel 2D-GAN and 3D-CNN training:
 CUDA release 10.2
 
 GAN inspired by pix2pix (Isola, Zhu et al., 2016)  
